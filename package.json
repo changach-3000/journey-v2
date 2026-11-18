@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "legacy": "vite legacy",
-    "build:legacy": "cd legacy && vite build --outDir ../dist --emptyOutDir",
+    "build:legacy": "cd legacy && vite build && rm -rf ../dist && cp -R dist ../dist",
     "routes": "node legacy/scripts/build-routes.mjs",
     "seed:build": "node scripts/make-seed.mjs",
     "seed:push": "npx convex run seed:run"
