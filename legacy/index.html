@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Journey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:wght@400;500&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main id="journey">
+      <div class="stage">
+        <div id="map" aria-hidden="true"></div>
+        <div class="vignette"></div>
+
+        <header class="hud">
+          <span class="hud__brand">Journey</span>
+          <span class="hud__place" id="hud-place">Earth</span>
+          <span class="hud__coords" id="hud-coords">0.00°, 0.00°</span>
+          <span class="hud__count" id="hud-count">01 / 04</span>
+        </header>
+
+        <div id="cards"></div>
+
+        <div class="scroll-hint" id="scroll-hint"><span></span>Scroll</div>
+        <div class="progress"><i id="progress-bar"></i></div>
+      </div>
+    </main>
+
+    <section id="featured" class="featured"></section>
+
+    <section class="outro">
+      <p class="outro__eyebrow">Your turn</p>
+      <h2 class="outro__title">Where to next?</h2>
+      <a class="outro__cta" href="#">Plan a route</a>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

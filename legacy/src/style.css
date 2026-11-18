@@ -1,0 +1,227 @@
+:root {
+  --bg: #07080a;
+  --fg: #f4f1ea;
+  --muted: rgba(244, 241, 234, 0.62);
+  --accent: #ffb454;
+  --display: 'Anton', Impact, 'Arial Narrow Bold', sans-serif;
+  --mono: 'DM Mono', ui-monospace, Menlo, monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Scroll length = how long the journey feels. 160vh per stop is a good start. */
+#journey { height: 900vh; position: relative; }
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+#map { position: absolute; inset: 0; }
+.maplibregl-ctrl-attrib { opacity: 0.5; font-size: 10px; }
+
+.vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 50%, transparent 45%, rgba(0,0,0,0.65) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 45%);
+}
+
+/* HUD */
+.hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;
+  padding: 1.4rem clamp(1.2rem, 4vw, 3rem);
+  font: 500 0.72rem/1 var(--mono);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+.hud__brand { color: var(--fg); }
+.hud__coords, .hud__count { text-align: right; }
+.hud__place { text-align: center; color: var(--fg); }
+@media (max-width: 640px) {
+  .hud { grid-template-columns: 1fr 1fr; row-gap: 0.7rem; }
+  .hud__place { text-align: right; }
+  .hud__coords { text-align: left; }
+}
+
+/* Cards */
+#cards { position: absolute; inset: 0; pointer-events: none; }
+.card {
+  position: absolute;
+  left: clamp(1.2rem, 4vw, 3rem);
+  bottom: clamp(3.5rem, 12vh, 7rem);
+  max-width: min(92vw, 1100px);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.card__eyebrow {
+  font: 500 0.78rem/1 var(--mono);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.1rem;
+}
+.card__title {
+  font: 400 clamp(3.2rem, 11vw, 10rem)/0.92 var(--display);
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+}
+.card__body {
+  margin-top: 1.3rem;
+  max-width: 34ch;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Scroll hint + progress */
+.scroll-hint {
+  position: absolute; left: 50%; bottom: 1.6rem; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  font: 500 0.68rem/1 var(--mono); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted);
+}
+.scroll-hint span {
+  width: 1px; height: 38px; background: linear-gradient(var(--fg), transparent);
+  animation: drip 1.8s ease-in-out infinite; transform-origin: top;
+}
+@keyframes drip { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.08); }
+.progress i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+
+/* Outro */
+.outro {
+  min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 1.4rem;
+  text-align: center; padding: 4rem 1.5rem; background: var(--bg);
+}
+.outro__eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.outro__title { font: 400 clamp(3rem, 9vw, 8rem)/0.95 var(--display); text-transform: uppercase; }
+.outro__cta {
+  margin-top: 1rem; padding: 0.95rem 1.8rem; border: 1px solid var(--fg); border-radius: 999px;
+  color: var(--fg); text-decoration: none; font: 500 0.8rem/1 var(--mono);
+  letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.2s, color 0.2s;
+}
+.outro__cta:hover { background: var(--fg); color: var(--bg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint span { animation: none; }
+}
+
+/* ---- Trip chapters: story links and map pins ---- */
+.card { --accent: #ffb454; max-width: min(92vw, 520px); }
+.card__title { font-size: clamp(2.6rem, 5.2vw, 5.4rem); }
+.card__eyebrow { color: var(--accent); }
+.stories { list-style: none; margin-top: 1.4rem; display: grid; gap: 0.15rem; }
+.stories a {
+  display: flex; gap: 0.9rem; align-items: baseline; padding: 0.35rem 0;
+  color: var(--fg); text-decoration: none; font-size: 0.95rem; line-height: 1.35;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  transition: color 0.2s, border-color 0.2s;
+}
+.stories a:hover { color: var(--accent); border-color: var(--accent); }
+.stories time { flex: none; width: 3.4rem; font: 500 0.7rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* MapLibre controls .pin itself (position, even opacity), so all styling lives on .pin__in. */
+.pin__in { display: flex; align-items: center; gap: 0.45rem; transition: opacity 0.4s; }
+.pin i {
+  width: 9px; height: 9px; border-radius: 50%; background: var(--pin, #ffb454);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pin, #ffb454) 25%, transparent);
+  transition: transform 0.3s;
+}
+.pin span {
+  font: 500 0.68rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--fg); text-shadow: 0 1px 6px rgba(0,0,0,0.9); white-space: nowrap;
+  opacity: 0; transform: translateX(-4px); transition: opacity 0.3s, transform 0.3s;
+}
+.pin[data-state='future'] { pointer-events: none; }
+.pin[data-state='future'] .pin__in { opacity: 0; }
+.pin[data-state='past'] .pin__in { opacity: 0.4; }
+.pin[data-state='active'] span { opacity: 1; transform: none; }
+.pin[data-state='active'] i { transform: scale(1.35); }
+.pin--minor[data-state='active'] span { opacity: 0; }
+.pin--minor:hover span { opacity: 1 !important; transform: none; }
+.pin--memory { --pin: #f4f1ea; }
+.pin--memory span { opacity: 0.8; transform: none; }
+
+/* ================================================================== */
+/* Featured routes                                                     */
+/* ================================================================== */
+.eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent, #ffb454); }
+
+.featured { padding: clamp(5rem, 14vh, 10rem) clamp(1.2rem, 4vw, 3rem) 2rem; background: var(--bg); position: relative; }
+.featured__head { max-width: 1280px; margin: 0 auto clamp(2rem, 6vh, 4rem); }
+.featured__title { margin: 1.1rem 0 1.2rem; font: 400 clamp(3.2rem, 9vw, 8rem)/0.94 var(--display); text-transform: uppercase; }
+.featured__lede { max-width: 44ch; color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; }
+
+.route {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.8rem, 5vw, 5rem); align-items: start;
+  padding: clamp(3rem, 9vh, 6.5rem) 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.route:nth-of-type(even) .route__photos { order: 2; }
+.route__photos { position: sticky; top: 2rem; display: grid; gap: 0.8rem; }
+
+.photo { width: 100%; object-fit: cover; border-radius: 10px; background: #11151b; display: block; }
+.photo--hero { aspect-ratio: 4 / 5; }
+.route__strip { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.photo--thumb { aspect-ratio: 4 / 3; }
+.photo--empty {
+  display: grid; place-content: center; text-align: center;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 30%, #0b0d10), #0b0d10 70%);
+  border: 1px dashed rgba(255,255,255,0.18);
+  color: var(--muted); font: 500 0.72rem/1.6 var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.photo--empty small { opacity: 0.7; text-transform: none; letter-spacing: 0.02em; }
+
+.route__body { min-width: 0; }
+.route__title { margin: 1rem 0 1rem; font: 400 clamp(2.6rem, 5vw, 4.8rem)/0.96 var(--display); text-transform: uppercase; }
+.route__summary { max-width: 42ch; color: var(--muted); font-size: 1.05rem; line-height: 1.55; }
+
+.route__stats { display: flex; gap: clamp(1.2rem, 3vw, 2.4rem); margin: 1.6rem 0 0; padding: 1rem 0; border-block: 1px solid rgba(255,255,255,0.1); }
+.route__stats dt { font: 500 0.66rem/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.45rem; }
+.route__stats dd { font: 400 1.7rem/1 var(--display); letter-spacing: 0.02em; }
+
+.route__quote { margin: 1.8rem 0 0; padding-left: 1.1rem; border-left: 2px solid var(--accent); }
+.route__quote p { font-size: clamp(1.15rem, 1.9vw, 1.45rem); line-height: 1.4; font-style: italic; }
+.route__quote footer { margin-top: 0.7rem; font: 500 0.7rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+.route__map { margin: 2rem 0 0; padding: 0.6rem; border-radius: 14px; background: #0c1016; border: 1px solid rgba(255,255,255,0.08); }
+.route__map svg { display: block; width: 100%; height: auto; max-height: 560px; }
+.route__map .grid line { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+.route__map .line { fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.route__map .line--glow { stroke-width: 8; opacity: 0.22; filter: blur(3px); }
+.route__map .pt { opacity: 0.18; transition: opacity 0.4s; }
+.route__map .pt.is-on { opacity: 1; }
+.route__map .pt__dot { fill: var(--accent); }
+.route__map .pt__ring { fill: none; stroke: var(--accent); stroke-opacity: 0.35; }
+.route__map .pt text { fill: var(--fg); font: 500 10.5px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; paint-order: stroke; stroke: #0c1016; stroke-width: 3px; }
+
+.route .stories { margin-top: 1.8rem; }
+.route__fly {
+  margin-top: 1.6rem; padding: 0.8rem 1.4rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--accent); background: transparent; color: var(--fg);
+  font: 500 0.74rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+  transition: background 0.2s, color 0.2s;
+}
+.route__fly:hover { background: var(--accent); color: var(--bg); }
+
+@media (max-width: 860px) {
+  .route { grid-template-columns: 1fr; }
+  .route:nth-of-type(even) .route__photos { order: 0; }
+  .route__photos { position: static; }
+  .photo--hero { aspect-ratio: 4 / 3; }
+}
